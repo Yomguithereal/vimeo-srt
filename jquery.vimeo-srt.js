@@ -27,6 +27,9 @@
 		this._defaults = defaults;
 		this._name = 'vimeoSrt';
 		this._srt = [];
+
+		// Working items
+		this._forward = true;
 		this._lastStep = 0;
 		this._lastSecond = 0.0;
 
@@ -44,19 +47,6 @@
 
 	// Utilities
 	//----------
-
-	// Seconds to time conversion
-	function toTime(seconds){
-		var sec_num = parseInt(seconds, 10); // don't forget the second parm
-		var hours   = Math.floor(sec_num / 3600);
-		var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-		var seconds = sec_num - (hours * 3600) - (minutes * 60);
-
-		if (hours   < 10) {hours   = "0"+hours;}
-		if (minutes < 10) {minutes = "0"+minutes;}
-		if (seconds < 10) {seconds = "0"+seconds;}
-		return hours+':'+minutes+':'+seconds;
-	}
 
 	// Time to milliseconds conversion
 	// TODO :: Clean this up
@@ -122,11 +112,14 @@
 				function onPlayProgress(data, id){
 
 					// Find the suitable subtitle step
+					self._forward = (data.seconds >= self._lastSecond);
 					self._lastSecond = parseFloat(data.seconds);
 					var step = self.findSuitableStep();
 
 					// Displaying subtitle
-					self._$subtitles.text(self._srt[step].text);
+					if(step){
+						self._$subtitles.html(self._srt[step].text);
+					}
 
 				}
 			}
@@ -143,7 +136,8 @@
 
 				if(split[1] !== undefined){
 					self._srt.push({
-						'seconds' : toMilliseconds(split[1].split(' --> ')[0])
+						'seconds_begin' : toMilliseconds(split[1].split(' --> ')[0])
+						,'seconds_end' : toMilliseconds(split[1].split(' --> ')[1])
 						,'time' : split[1]
 						,'text' : split[2]
 					});
@@ -155,12 +149,19 @@
 		,findSuitableStep: function(){
 
 			// Looping to find good position
-			while(this._lastSecond >= this._srt[this._lastStep].seconds){
-				this._lastStep += 1;
+			if(this._forward){
+				while(this._lastSecond >= this._srt[this._lastStep].seconds_end){
+					this._lastStep += 1;
+				}
+			}
+			else{
+				while(this._lastSecond <= this._srt[this._lastStep].seconds_end){
+					this._lastStep -= 1;
+				}
 			}
 
 			// Returning good step
-			return this._lastStep;
+			return this._srt[this._lastStep].seconds_begin > this._lastSecond ? false : this._lastStep;
 		}
 
 	};
