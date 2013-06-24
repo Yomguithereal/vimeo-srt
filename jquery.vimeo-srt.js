@@ -29,9 +29,7 @@
 		this._srt = [];
 
 		// Working items
-		this._forward = true;
-		this._lastStep = 0;
-		this._lastSecond = 0.0;
+		this._currentSecond = 0.0;
 
 		// Selectors
 		this._$iframe = false;
@@ -49,7 +47,6 @@
 	//----------
 
 	// Time to milliseconds conversion
-	// TODO :: Clean this up
 	function toMilliseconds(time){
 		var split = time.split(',');
 		var milliseconds = parseInt(split[1]);
@@ -65,6 +62,16 @@
 		var milliseconds = seconds.split('.')[1];
 		seconds = parseInt(seconds);
 		return toTime(seconds)+','+milliseconds;
+	}
+
+	// Get Nearest element in array
+	function getClosest(array, target) {
+		var tuples = array.map(function(val) {
+			return [val, Math.abs(val.seconds_begin - target)];
+		});
+		return tuples.reduce(function(memo, val) {
+			return (memo[1] < val[1]) ? memo : val;
+		}, [-1, 999])[0];
 	}
 
 
@@ -112,13 +119,12 @@
 				function onPlayProgress(data, id){
 
 					// Find the suitable subtitle step
-					self._forward = (data.seconds >= self._lastSecond);
-					self._lastSecond = parseFloat(data.seconds);
+					self._currentSecond = parseFloat(data.seconds);
 					var step = self.findSuitableStep();
 
 					// Displaying subtitle
 					if(step){
-						self._$subtitles.html(self._srt[step].text);
+						self._$subtitles.html(step.text);
 					}
 
 				}
@@ -139,7 +145,7 @@
 						'seconds_begin' : toMilliseconds(split[1].split(' --> ')[0])
 						,'seconds_end' : toMilliseconds(split[1].split(' --> ')[1])
 						,'time' : split[1]
-						,'text' : split[2]
+						,'text' : split.slice(2, 5).join('<br>')
 					});
 				}
 			});
@@ -149,19 +155,10 @@
 		,findSuitableStep: function(){
 
 			// Looping to find good position
-			if(this._forward){
-				while(this._lastSecond >= this._srt[this._lastStep].seconds_end){
-					this._lastStep += 1;
-				}
-			}
-			else{
-				while(this._lastSecond <= this._srt[this._lastStep].seconds_end){
-					this._lastStep -= 1;
-				}
-			}
+			var step = getClosest(this._srt, this._currentSecond);
 
 			// Returning good step
-			return this._srt[this._lastStep].seconds_begin > this._lastSecond ? false : this._lastStep;
+			return step.seconds_begin > this._currentSecond ? false : step;
 		}
 
 	};
