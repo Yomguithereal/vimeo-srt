@@ -15,7 +15,7 @@ $(your_vimeo_iframe).vimeoSrt('path_to_srt');
 ```
 It will load the subtitle file with ajax, parse it and attach
 playing events to your video to display subtitles under your 
-iframe in a div with the same id prefixed with _subtitle.
+iframe in a div with the same id suffixed with _subtitle.
 
 Supported Files
 ---------------
