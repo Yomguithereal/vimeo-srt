@@ -145,7 +145,7 @@
 						'seconds_begin' : toMilliseconds(split[1].split(' --> ')[0])
 						,'seconds_end' : toMilliseconds(split[1].split(' --> ')[1])
 						,'time' : split[1]
-						,'text' : split.slice(2, 5).join('<br>')
+						,'text' : split.slice(2).join('<br>')
 					});
 				}
 			});
