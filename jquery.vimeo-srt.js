@@ -138,8 +138,8 @@
 			// Parsing the srt file
 			var self = this;
 			srt_string.split(this._spaces).forEach(function(step){
-				var split = step.split(self._carriages);
-
+				var split = step.split(self._carriages).filter(function(i){ return $.trim(i) != '' });
+				
 				if(split[1] !== undefined){
 					self._srt.push({
 						'seconds_begin' : toMilliseconds(split[1].split(' --> ')[0])
