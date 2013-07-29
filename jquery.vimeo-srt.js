@@ -30,6 +30,7 @@
 
 		// Working items
 		this._currentSecond = 0.0;
+		this._currentStep = false;
 
 		// Selectors
 		this._$iframe = false;
@@ -55,19 +56,10 @@
 		return parseFloat(seconds + '.' + milliseconds);
 	}
 
-	// From vimeo secons to srt time
-	function convertSeconds(seconds) {
-
-		// Preparing
-		var milliseconds = seconds.split('.')[1];
-		seconds = parseInt(seconds);
-		return toTime(seconds)+','+milliseconds;
-	}
-
 	// Get Nearest element in array
 	function getClosest(array, target) {
 		var tuples = array.map(function(val) {
-			return [val, Math.abs(val.seconds_begin - target)];
+			return [val, Math.abs(val.seconds_median - target)];
 		});
 		return tuples.reduce(function(memo, val) {
 			return (memo[1] < val[1]) ? memo : val;
@@ -124,7 +116,13 @@
 
 					// Displaying subtitle
 					if(step){
-						self._$subtitles.html(step.text);
+						if(step.id !== self._currentStep.id){
+							self._currentStep = step;
+							self._$subtitles.html(self._currentStep.text);
+						}
+					}
+					else{
+						self._$subtitles.html('&nbsp;');
 					}
 
 				}
@@ -141,12 +139,16 @@
 				var split = step.split(self._carriages).filter(function(i){ return $.trim(i) != '' });
 				
 				if(split[1] !== undefined){
-					self._srt.push({
-						'seconds_begin' : toMilliseconds(split[1].split(' --> ')[0])
+					var step = {
+						'id' : split[0]
+						,'seconds_begin' : toMilliseconds(split[1].split(' --> ')[0])
 						,'seconds_end' : toMilliseconds(split[1].split(' --> ')[1])
-						,'time' : split[1]
 						,'text' : split.slice(2).join('<br>')
-					});
+					};
+
+					// Median for relevant closest find
+					step.seconds_median = (step.seconds_begin + step.seconds_end) / 2;
+					self._srt.push(step);
 				}
 			});
 		}
@@ -158,7 +160,15 @@
 			var step = getClosest(this._srt, this._currentSecond);
 
 			// Returning good step
-			return step.seconds_begin > this._currentSecond ? false : step;
+			if(step.seconds_begin <= this._currentSecond){
+				if((step.seconds_end + 1.0) >= this._currentSecond){
+					return step;
+				}
+				else{
+					return false;
+				}
+			}
+			return false;
 		}
 
 	};
