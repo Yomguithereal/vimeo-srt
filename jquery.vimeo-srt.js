@@ -4,6 +4,7 @@
  *  embedded videos.
  *  Author: PLIQUE Guillaume (Yomguithereal)
  *  Dependancies : -- Froogaloop API --
+ *               : -- jQuery --
  *  License: MIT
  */
 
@@ -160,15 +161,9 @@
 			var step = getClosest(this._srt, this._currentSecond);
 
 			// Returning good step
-			if(step.seconds_begin <= this._currentSecond){
-				if((step.seconds_end + 1.0) >= this._currentSecond){
-					return step;
-				}
-				else{
-					return false;
-				}
-			}
-			return false;
+			return ((step.seconds_begin <= this._currentSecond) && ((step.seconds_end + 1.0) >= this._currentSecond))
+				? step
+				: false;
 		}
 
 	};
