@@ -3,6 +3,7 @@
  *  Description: A simplistic jQuery plugin to display srt subtitles with vimeo
  *  embedded videos.
  *  Author: PLIQUE Guillaume (Yomguithereal)
+ *  Modified by: Oscar Otero (oscarotero)
  *  Dependancies : -- Froogaloop API --
  *               : -- jQuery --
  *  License: MIT
@@ -80,30 +81,18 @@
 			this._$iframe = $(this.element);
 
 			// Waiting for the iframe to be ready
-			this._$iframe.load(loadSrt);
-
-			// Loading the srt file
-			function loadSrt(){
-				$.get(self.options.srt, function(srt){
-
-					// Creating a dom element to contain the subtitles
-					self._$iframe.after('<div id="'+self.element.getAttribute('id')+'_subtitles">&nbsp;</div>');
-					self._$subtitles = $('#'+self.element.getAttribute('id')+'_subtitles');
-
-					// Parsing
-					self.parseSrt(srt);
-
-					// Creating Events
+			this._$iframe.load(function () {
+				// Loading the srt file
+				self.loadSrt(self.options.srt, function () {
 					froogaloopEvent();
 				});
-			}
+			});
 
 			// Froogaloop Events
 			function froogaloopEvent(){
-				var player = $f(self.element.getAttribute('id'));
+				var player = $f(self._$iframe[0]);
 
 				player.addEvent('ready', function(){
-
 					// Adding Events when ready
 					player.addEvent('playProgress', onPlayProgress);
 				});
@@ -113,7 +102,7 @@
 
 					// Find the suitable subtitle step
 					self._currentSecond = parseFloat(data.seconds);
-					var step = self.findSuitableStep();
+					var step = self._findSuitableStep();
 
 					// Displaying subtitle
 					if(step){
@@ -132,7 +121,7 @@
 		}
 
 		// Parsing the srt file
-		,parseSrt: function(srt_string){
+		,_parseSrt: function(srt_string){
 
 			// Parsing the srt file
 			var self = this;
@@ -155,7 +144,7 @@
 		}
 
 		// Checking srt to find suitable step
-		,findSuitableStep: function(){
+		,_findSuitableStep: function(){
 
 			// Looping to find good position
 			var step = getClosest(this._srt, this._currentSecond);
@@ -166,17 +155,59 @@
 				: false;
 		}
 
+		,loadSrt: function (file, callback) {
+			var self = this;
+
+			$.get(file, function (srt) {
+
+				// Creating a dom element to contain the subtitles
+				if (!self._$subtitles) {
+					self._$iframe.after('<div id="'+self.element.getAttribute('id')+'_subtitles">&nbsp;</div>');
+					self._$subtitles = $('#'+self.element.getAttribute('id')+'_subtitles');
+				}
+
+				//Remove the current subtitles
+				self._srt = [];
+
+				//Set new subtitles
+				self._parseSrt(srt);
+
+				if ($.isFunction(callback)) {
+					callback();
+				}
+			});
+		}
 	};
 
 
 	// Exporting
 	//----------
 	$.fn[vimeoSrt] = function ( options ) {
-		return this.each(function () {
-			if (!$.data(this, "plugin_" + vimeoSrt)) {
-				$.data(this, "plugin_" + vimeoSrt, new Plugin( this, options ));
-			}
-		});
+		if ((options === undefined) || (typeof options === 'object')) {
+			return this.each(function () {
+				if (!$.data(this, "plugin_" + vimeoSrt)) {
+					$.data(this, "plugin_" + vimeoSrt, new Plugin(this, options));
+				}
+			});
+		}
+
+		if ((typeof options === 'string') && (options[0] !== '_') && (options !== 'init')) {
+			var returns, args = arguments;
+
+			this.each(function () {
+				var instance = $.data(this, 'plugin_' + vimeoSrt);
+
+				if ((instance instanceof Plugin) && (typeof instance[options] === 'function')) {
+					returns = instance[options].apply(instance, Array.prototype.slice.call(args, 1));
+				}
+
+				if (options === 'destroy') {
+				  $.data(this, 'plugin_' + vimeoSrt, null);
+				}
+			});
+
+			return returns !== undefined ? returns : this;
+		}
 	};
 
 })( jQuery, Froogaloop, window, document );

@@ -17,8 +17,10 @@
     </head>
     <body>
         <div id="container">
-            <iframe id="vimeoplayer" video="68038551" width="690px" height="422px" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" src="http://player.vimeo.com/video/68038551?api=1&player_id=vimeoplayer" scrolling="no"></iframe>
+            <!--<iframe src="http://player.vimeo.com/video/73386596" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> <p><a href="http://vimeo.com/73386596">Basement Jaxx - What A Difference Your Love Makes</a> from <a href="http://vimeo.com/hellolove">Love Commercial Production Co.</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
+            --><iframe id="vimeoplayer" video="73386596" width="690px" height="422px" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" src="http://player.vimeo.com/video/73386596?api=1&player_id=vimeoplayer" scrolling="no"></iframe>
         </div>
+        <button id="change">change to xxx</button>
         <script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
         <script src="http://a.vimeocdn.com/js/froogaloop2.min.js"></script>
         <script src="jquery.vimeo-srt.js"></script>
@@ -26,6 +28,10 @@
             $(document).ready(function(){
                 var $player =$("#vimeoplayer");
                 $player.vimeoSrt({srt : 'sample.srt'});
+
+                $('#change').click(function () {
+                    $player.vimeoSrt('loadSrt', 'sample2.srt');
+                })
             });
         </script>
     </body>
