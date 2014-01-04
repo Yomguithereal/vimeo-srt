@@ -32,16 +32,11 @@ Be sure to pass the linter and uglify the code before submitting any change to t
 grunt
 ```
 
-If you just want to minify the plugin for production yourself
+If you just want to minify the plugin for production yourself.
 
 ```bash
 grunt uglify
 ```
-
-Supported Files
----------------
-As indicated in the name of the plugin, only srt files can be loaded.
-
 Dependencies
 ------------
     jQuery
