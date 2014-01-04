@@ -1,7 +1,7 @@
 Vimeo Srt Jquery Plugin
 =======================
 
-Dependancies
+Dependencies
 ------------
 	jQuery (any version >= 1.6)
 	Froogaloop API
@@ -21,3 +21,6 @@ Supported Files
 ---------------
 As indicated in the name of the plugin, only srt files can be loaded.
 So do not bother trying other formats.
+
+
+ADD CONTRIBUTORS and tell to lint and how to build and how to change the srt.
