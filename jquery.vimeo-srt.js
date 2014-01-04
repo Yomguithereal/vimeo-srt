@@ -65,10 +65,11 @@
   var _helpers = {
     toMilliseconds: function(time) {
       var split = time.split(','),
-        milliseconds = +split[1],
+        milliseconds = +split[1] / 1000,
         subsplit = split[0].split(':'),
         seconds = +subsplit[0] * 3600 + +subsplit[1] * 60 + +subsplit[2];
-      return seconds + (milliseconds / 1000);
+
+      return seconds + milliseconds;
     },
     getClosestStep: function(array, target) {
       var tuples = array.map(function(val) {
