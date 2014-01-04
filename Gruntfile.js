@@ -15,7 +15,7 @@ module.exports = function(grunt) {
     },
     uglify: {
       options: {
-        banner: '/* Vimeo Srt - <%= pkg.description %> - Version: <%= pkg.version %> - Author:  Yomguithereal - License: MIT */\n'
+        banner: '/* Vimeo Srt - <%= pkg.description %> - Version: <%= pkg.version %> - Author:  Yomguithereal - Contributors: oscarotero - License: MIT */\n'
       },
       prod: {
         files: {
