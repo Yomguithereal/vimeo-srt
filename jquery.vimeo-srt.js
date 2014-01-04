@@ -10,7 +10,7 @@
    * Description: A simplistic jQuery plugin to display srt subtitles with vimeo
    * embedded videos.
    * URL: https://github.com/Yomguithereal/vimeo-srt.git
-   * Dependancies : -- Froogaloop API --
+   * Dependencies : -- Froogaloop API --
    *              : -- jQuery --
    * License: MIT
    * Version: 1.0
